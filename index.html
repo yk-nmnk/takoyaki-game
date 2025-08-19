@@ -5,135 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>たこ焼きロシアンルーレット</title>
     <style>
+        :root {
+            --plate-size: 450px;
+            --brown-dark: #8b4513;
+            --brown-light: #f0e4d7;
+            --orange-main: #e67e22;
+            --orange-dark: #d35400;
+        }
         body {
-            background-color: #f0e4d7;
+            background-color: var(--brown-light);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             text-align: center;
             padding: 1em;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
             margin: 0;
+            transition: background-color 0.5s ease;
         }
-        h1 {
-            color: #8b4513;
+        body.hazure-effect {
+            background-color: #ff7675;
         }
-        /* 名前入力のオーバーレイ */
-        #name-entry-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+        .container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
-            align-items: center;
-            z-index: 100;
+            align-items: flex-start;
+            gap: 2em;
+            width: 100%;
         }
-        #name-entry-box {
-            background: white;
-            padding: 2em;
+        .game-area {
+            flex-grow: 1;
+            max-width: 500px;
+        }
+        .info-area {
+            flex-grow: 1;
+            max-width: 300px;
+            background: rgba(255,255,255,0.5);
+            padding: 1em;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        #name-input {
-            font-size: 1.2em;
-            padding: 0.5em;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+        h1 { color: var(--brown-dark); }
+        h2 { color: var(--brown-dark); border-bottom: 2px solid var(--orange-main); padding-bottom: 0.3em; }
+
+        /* 名前入力 */
+        #name-entry-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); display: flex;
+            justify-content: center; align-items: center; z-index: 100;
         }
-        /* お皿 */
+        #name-entry-box { background: white; padding: 2em; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        #name-input { font-size: 1.2em; padding: 0.5em; border-radius: 5px; border: 1px solid #ccc; }
+
+        /* ゲーム盤 */
         #plate {
-            background-color: #ffffff;
-            width: 90vw;
-            height: 90vw;
-            max-width: 450px;
-            max-height: 450px;
-            border-radius: 50%;
-            border: 5px solid #dcdcdc;
+            background-color: #ffffff; width: 90vw; height: 90vw;
+            max-width: var(--plate-size); max-height: var(--plate-size);
+            border-radius: 50%; border: 5px solid #dcdcdc;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 0 0 15px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center; margin: 1em auto;
         }
-        #game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            width: 80%;
-        }
+        #game-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 80%; }
         .takoyaki {
-            width: 100%;
-            padding-top: 100%;
-            position: relative;
-            cursor: pointer;
+            width: 100%; padding-top: 100%; position: relative; cursor: pointer;
             transition: transform 0.2s, opacity 0.3s;
         }
         .takoyaki::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3cdefs%3e%3cradialGradient id='grad' cx='0.3' cy='0.3' r='0.7'%3e%3cstop offset='0%25' stop-color='%23e6b88a'/%3e%3cstop offset='100%25' stop-color='%23c68642'/%3e%3c/radialGradient%3e%3c/defs%3e%3ccircle cx='50' cy='50' r='45' fill='url(%23grad)'/%3e%3cpath d='M20,50 C35,30 65,30 80,50' stroke='%23804a2e' stroke-width='10' fill='none' stroke-linecap='round'/%3e%3ccircle cx='35' cy='60' r='4' fill='%232e8b57'/%3e%3ccircle cx='65' cy='55' r='4' fill='%232e8b57'/%3e%3ccircle cx='50' cy='45' r='3' fill='%23ff6347'/%3e%3c/svg%3e");
             background-size: cover;
         }
-        .takoyaki:hover {
-            transform: scale(1.1);
+        .takoyaki:hover { transform: scale(1.1); }
+        .takoyaki.hidden { opacity: 0; pointer-events: none; transform: scale(0.5); }
+        
+        /* 情報表示 */
+        #info-text, #last-action-text { font-size: 1.2em; font-weight: bold; min-height: 30px; color: #333; }
+        #last-action-text { color: var(--orange-dark); }
+        
+        /* 参加者と履歴 */
+        #participants-list, #history-log {
+            list-style: none; padding: 0; text-align: left;
         }
-        .takoyaki.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.5);
+        #participants-list li, #history-log li {
+            background: white; margin-bottom: 0.5em; padding: 0.5em; border-radius: 5px;
         }
-        #info-text, #last-action-text {
-            font-size: 1.2em;
+        #history-log li.hazure {
+            background-color: #fab1a0;
             font-weight: bold;
-            height: 30px;
-            color: #333;
         }
-        #last-action-text {
-            color: #d35400;
-        }
+
+        /* ボタン */
         button {
-            background-color: #e67e22;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1em;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
+            background-color: var(--orange-main); color: white; border: none; padding: 10px 20px;
+            font-size: 1em; border-radius: 5px; cursor: pointer; margin-top: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        button:hover {
-            background-color: #d35400;
-        }
+        button:hover { background-color: var(--orange-dark); }
     </style>
 </head>
 <body>
     <!-- 名前入力画面 -->
     <div id="name-entry-overlay">
         <div id="name-entry-box">
-            <h2>名前を入力してくれ！</h2>
+            <h2>名前は？</h2>
             <input type="text" id="name-input" placeholder="なまえ" maxlength="10">
             <button id="name-submit">ゲームに参加</button>
         </div>
     </div>
 
-    <h1>たこ焼きロシアンルーレット</h1>
-    <p id="info-text">ゲームの準備中...</p>
-    <p id="last-action-text">　</p>
-
-    <div id="plate">
-        <div id="game-board"></div>
+    <div class="container">
+        <div class="game-area">
+            <h1>たこ焼きロシアンルーレット</h1>
+            <p id="info-text">ゲームの準備中...</p>
+            <p id="last-action-text">　</p>
+            <div id="plate">
+                <div id="game-board"></div>
+            </div>
+            <button id="reset-button">ゲームをリセット</button>
+        </div>
+        <div class="info-area">
+            <h2>参加者</h2>
+            <ul id="participants-list"></ul>
+            <h2>履歴</h2>
+            <ul id="history-log"></ul>
+        </div>
     </div>
-    
-    <button id="reset-button" style="display: none;">もう一回遊ぶ</button>
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
