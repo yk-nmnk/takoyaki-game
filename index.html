@@ -5,28 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>たこ焼きロシアンルーレット</title>
     <style>
-        body { 
-            background-color: #fff3e0; 
+        body {
+            background-color: #f0e4d7;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            text-align: center; 
+            text-align: center;
             padding: 1em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
         }
-        h1 { 
-            color: #d35400; 
+        h1 {
+            color: #8b4513;
         }
-        #game-board { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 15px; 
-            max-width: 400px; 
-            margin: 30px auto; 
+        /* 名前入力のオーバーレイ */
+        #name-entry-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        #name-entry-box {
+            background: white;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        #name-input {
+            font-size: 1.2em;
+            padding: 0.5em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        /* お皿 */
+        #plate {
+            background-color: #ffffff;
+            width: 90vw;
+            height: 90vw;
+            max-width: 450px;
+            max-height: 450px;
+            border-radius: 50%;
+            border: 5px solid #dcdcdc;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 0 0 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            width: 80%;
         }
         .takoyaki {
             width: 100%;
-            padding-top: 100%; /* これで正方形を維持 */
+            padding-top: 100%;
             position: relative;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, opacity 0.3s;
         }
         .takoyaki::before {
             content: '';
@@ -35,49 +79,67 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* SVGでたこ焼きを描画 */
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3cdefs%3e%3cradialGradient id='grad' cx='0.3' cy='0.3' r='0.7'%3e%3cstop offset='0%25' stop-color='%23e6b88a'/%3e%3cstop offset='100%25' stop-color='%23c68642'/%3e%3c/radialGradient%3e%3c/defs%3e%3ccircle cx='50' cy='50' r='45' fill='url(%23grad)'/%3e%3cpath d='M20,50 C35,30 65,30 80,50' stroke='%23804a2e' stroke-width='10' fill='none' stroke-linecap='round'/%3e%3ccircle cx='35' cy='60' r='4' fill='%232e8b57'/%3e%3ccircle cx='65' cy='55' r='4' fill='%232e8b57'/%3e%3ccircle cx='50' cy='45' r='3' fill='%23ff6347'/%3e%3c/svg%3e");
             background-size: cover;
         }
-        .takoyaki:hover { 
-            transform: scale(1.1); 
+        .takoyaki:hover {
+            transform: scale(1.1);
         }
-        .takoyaki.hidden { 
-            visibility: hidden; 
+        .takoyaki.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.5);
         }
-        #info-text { 
-            font-size: 1.2em; 
-            font-weight: bold; 
-            height: 30px; 
+        #info-text, #last-action-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            height: 30px;
             color: #333;
         }
-        button { 
-            background-color: #e67e22; 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            font-size: 1em; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            margin-top: 20px; 
+        #last-action-text {
+            color: #d35400;
+        }
+        button {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        button:hover { 
-            background-color: #d35400; 
+        button:hover {
+            background-color: #d35400;
         }
     </style>
 </head>
 <body>
+    <!-- 名前入力画面 -->
+    <div id="name-entry-overlay">
+        <div id="name-entry-box">
+            <h2>名前を入力してくれ！</h2>
+            <input type="text" id="name-input" placeholder="なまえ" maxlength="10">
+            <button id="name-submit">ゲームに参加</button>
+        </div>
+    </div>
+
     <h1>たこ焼きロシアンルーレット</h1>
-    <p id="info-text">好きな たこ焼き を選んでくれ！</p>
-    <div id="game-board"></div>
+    <p id="info-text">ゲームの準備中...</p>
+    <p id="last-action-text">　</p>
+
+    <div id="plate">
+        <div id="game-board"></div>
+    </div>
+    
     <button id="reset-button" style="display: none;">もう一回遊ぶ</button>
 
-    <!-- Firebaseを動かすための魔法の呪文 -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
-    <!-- 俺たちが書いたJSファイル -->
+    <!-- JSファイル -->
     <script src="app.js"></script>
 </body>
 </html>
