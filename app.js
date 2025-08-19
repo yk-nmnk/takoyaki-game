@@ -29,13 +29,22 @@ const historyLog = document.getElementById('history-log');
 const playerInfo = document.getElementById('player-info');
 const playerNameDisplay = document.getElementById('player-name-display');
 const logoutButton = document.getElementById('logout-button');
+const birthdaySurprise = document.getElementById('birthday-surprise');
 
 const TAKOYAKI_COUNT = 8;
 let player = { name: '', key: '' };
 
-// --- 名前の処理 ---
+// 誕生日期間かチェックする関数
+function isBirthdayPeriod() {
+    const today = new Date();
+    const month = today.getMonth() + 1; // 1月は0
+    const day = today.getDate();
 
-// ログイン処理をまとめた関数
+    // 8月10日から8月31日まで
+    return month === 8 && day >= 10 && day <= 31;
+}
+
+// --- 名前の処理 ---
 function login(name, key) {
     player.name = name;
     player.key = key;
@@ -48,7 +57,6 @@ function login(name, key) {
     playerNameDisplay.textContent = player.name;
 }
 
-// ページ読み込み時にlocalStorageから復帰を試みる
 const storedName = localStorage.getItem('takoyakiPlayerName');
 const storedKey = localStorage.getItem('takoyakiPlayerKey');
 
@@ -56,7 +64,6 @@ if (storedName && storedKey) {
     login(storedName, storedKey);
 }
 
-// 名前決定ボタンの処理
 nameSubmit.addEventListener('click', () => {
     const inputName = nameInput.value.trim();
     if (inputName) {
@@ -72,24 +79,19 @@ nameSubmit.addEventListener('click', () => {
     }
 });
 
-// ログアウト処理
 logoutButton.addEventListener('click', () => {
     if (player.key) {
         playersRef.child(player.key).remove();
     }
     localStorage.removeItem('takoyakiPlayerName');
     localStorage.removeItem('takoyakiPlayerKey');
-
     player = { name: '', key: '' };
-    
     nameOverlay.style.display = 'flex';
     playerInfo.style.display = 'none';
     nameInput.value = '';
 });
 
-
 // --- ゲームのメイン処理 ---
-
 gameRef.on('value', (snapshot) => {
     const gameState = snapshot.val();
     if (!gameState) {
@@ -100,23 +102,26 @@ gameRef.on('value', (snapshot) => {
 });
 
 playersRef.on('value', (snapshot) => {
-    const players = snapshot.val() || {};
-    updateParticipantsUI(players);
+    updateParticipantsUI(snapshot.val() || {});
 });
 
 function updateGameUI(state) {
     gameBoard.innerHTML = '';
+    let openedCount = 0;
     state.takoyaki.forEach((tako, i) => {
         const takoyakiEl = document.createElement('div');
         takoyakiEl.classList.add('takoyaki');
-        if (tako.opened) takoyakiEl.classList.add('hidden');
+        if (tako.opened) {
+            takoyakiEl.classList.add('hidden');
+            openedCount++;
+        }
         takoyakiEl.addEventListener('click', () => selectTakoyaki(i));
         gameBoard.appendChild(takoyakiEl);
     });
 
     historyLog.innerHTML = '';
     if (state.history) {
-        state.history.slice().reverse().forEach(log => { // 新しい順に表示
+        state.history.slice().reverse().forEach(log => {
             const li = document.createElement('li');
             li.textContent = log.message;
             if (log.hazure) li.classList.add('hazure');
@@ -131,6 +136,14 @@ function updateGameUI(state) {
     if (lastHistory && lastHistory.playerKey === player.key && lastHistory.hazure) {
         document.body.classList.add('hazure-effect');
         setTimeout(() => document.body.classList.remove('hazure-effect'), 2000);
+    }
+
+    // 誕生日サプライズの表示チェック
+    if (openedCount === TAKOYAKI_COUNT && isBirthdayPeriod()) {
+        birthdaySurprise.style.display = 'flex';
+        infoText.textContent = "おめでとう！";
+    } else {
+        birthdaySurprise.style.display = 'none';
     }
 }
 
