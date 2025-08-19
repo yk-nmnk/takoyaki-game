@@ -10,8 +10,6 @@ const firebaseConfig = {
 };
 // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-// ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-
 // --- この下はもういじらなくてOK！ ---
 
 firebase.initializeApp(firebaseConfig);
@@ -22,49 +20,76 @@ const playersRef = db.ref('takoyaki-game/players');
 // HTML要素を取得
 const gameBoard = document.getElementById('game-board');
 const infoText = document.getElementById('info-text');
-const lastActionText = document.getElementById('last-action-text');
 const resetButton = document.getElementById('reset-button');
 const nameOverlay = document.getElementById('name-entry-overlay');
 const nameInput = document.getElementById('name-input');
 const nameSubmit = document.getElementById('name-submit');
 const participantsList = document.getElementById('participants-list');
 const historyLog = document.getElementById('history-log');
+const playerInfo = document.getElementById('player-info');
+const playerNameDisplay = document.getElementById('player-name-display');
+const logoutButton = document.getElementById('logout-button');
 
 const TAKOYAKI_COUNT = 8;
 let player = { name: '', key: '' };
 
 // --- 名前の処理 ---
-player.name = sessionStorage.getItem('takoyakiPlayerName');
-player.key = sessionStorage.getItem('takoyakiPlayerKey');
 
-if (player.name && player.key) {
-    nameOverlay.style.display = 'none';
-    // 既にキーがある場合、存在を確認して再接続
+// ログイン処理をまとめた関数
+function login(name, key) {
+    player.name = name;
+    player.key = key;
+
     playersRef.child(player.key).set(player.name);
     playersRef.child(player.key).onDisconnect().remove();
+
+    nameOverlay.style.display = 'none';
+    playerInfo.style.display = 'block';
+    playerNameDisplay.textContent = player.name;
 }
 
+// ページ読み込み時にlocalStorageから復帰を試みる
+const storedName = localStorage.getItem('takoyakiPlayerName');
+const storedKey = localStorage.getItem('takoyakiPlayerKey');
+
+if (storedName && storedKey) {
+    login(storedName, storedKey);
+}
+
+// 名前決定ボタンの処理
 nameSubmit.addEventListener('click', () => {
     const inputName = nameInput.value.trim();
     if (inputName) {
-        player.name = inputName;
-        const newPlayerRef = playersRef.push(); // 新しいユニークなキーを生成
-        player.key = newPlayerRef.key;
+        const newPlayerRef = playersRef.push();
+        const newKey = newPlayerRef.key;
         
-        newPlayerRef.set(player.name); // サーバーに名前を保存
-        newPlayerRef.onDisconnect().remove(); // タブを閉じたら自動で削除
+        localStorage.setItem('takoyakiPlayerName', inputName);
+        localStorage.setItem('takoyakiPlayerKey', newKey);
 
-        sessionStorage.setItem('takoyakiPlayerName', player.name);
-        sessionStorage.setItem('takoyakiPlayerKey', player.key);
-        nameOverlay.style.display = 'none';
+        login(inputName, newKey);
     } else {
         alert('名前を入力してくれ！');
     }
 });
 
+// ログアウト処理
+logoutButton.addEventListener('click', () => {
+    if (player.key) {
+        playersRef.child(player.key).remove();
+    }
+    localStorage.removeItem('takoyakiPlayerName');
+    localStorage.removeItem('takoyakiPlayerKey');
+
+    player = { name: '', key: '' };
+    
+    nameOverlay.style.display = 'flex';
+    playerInfo.style.display = 'none';
+    nameInput.value = '';
+});
+
+
 // --- ゲームのメイン処理 ---
 
-// ゲーム状態の監視
 gameRef.on('value', (snapshot) => {
     const gameState = snapshot.val();
     if (!gameState) {
@@ -74,15 +99,12 @@ gameRef.on('value', (snapshot) => {
     updateGameUI(gameState);
 });
 
-// 参加者リストの監視
 playersRef.on('value', (snapshot) => {
     const players = snapshot.val() || {};
     updateParticipantsUI(players);
 });
 
-// UI更新
 function updateGameUI(state) {
-    // たこ焼き表示
     gameBoard.innerHTML = '';
     state.takoyaki.forEach((tako, i) => {
         const takoyakiEl = document.createElement('div');
@@ -92,10 +114,9 @@ function updateGameUI(state) {
         gameBoard.appendChild(takoyakiEl);
     });
 
-    // 履歴表示
     historyLog.innerHTML = '';
     if (state.history) {
-        state.history.forEach(log => {
+        state.history.slice().reverse().forEach(log => { // 新しい順に表示
             const li = document.createElement('li');
             li.textContent = log.message;
             if (log.hazure) li.classList.add('hazure');
@@ -103,16 +124,13 @@ function updateGameUI(state) {
         });
     }
 
-    // メッセージ更新
     const hazureFound = state.takoyaki.filter(t => t.opened && (t.content !== 'あたり')).length;
     infoText.textContent = (hazureFound >= 2) ? "ゲーム終了！ハズレが出揃ったぜ！" : `ハズレは残り ${2 - hazureFound} 個だ！`;
-    lastActionText.textContent = state.lastAction || 'さあ、誰からいく？';
 
-    // ハズレ演出
     const lastHistory = state.history ? state.history[state.history.length - 1] : null;
     if (lastHistory && lastHistory.playerKey === player.key && lastHistory.hazure) {
         document.body.classList.add('hazure-effect');
-        setTimeout(() => document.body.classList.remove('hazure-effect'), 2000); // 2秒後に戻す
+        setTimeout(() => document.body.classList.remove('hazure-effect'), 2000);
     }
 }
 
@@ -125,7 +143,6 @@ function updateParticipantsUI(players) {
     }
 }
 
-// たこ焼き選択
 function selectTakoyaki(id) {
     if (!player.name) {
         alert('まず名前を入力してくれ！');
@@ -133,17 +150,15 @@ function selectTakoyaki(id) {
     }
     gameRef.transaction(currentState => {
         if (!currentState) return currentState;
-
         const hazureCount = currentState.takoyaki.filter(t => t.opened && t.content !== 'あたり').length;
-        if (currentState.takoyaki[id].opened || hazureCount >= 2) return; // 中止
+        if (currentState.takoyaki[id].opened || hazureCount >= 2) return;
 
         currentState.takoyaki[id].opened = true;
         const result = currentState.takoyaki[id].content;
         const isHazure = result !== 'あたり';
         
         let message = isHazure ? `【激辛】${player.name} は ${result}入りを引いた！` : `${player.name} はセーフ！うまい！`;
-        currentState.lastAction = message;
-
+        
         if (!currentState.history) currentState.history = [];
         currentState.history.push({ message: message, hazure: isHazure, playerKey: player.key });
         
@@ -151,7 +166,6 @@ function selectTakoyaki(id) {
     });
 }
 
-// リセット
 resetButton.addEventListener('click', initializeGame);
 
 function initializeGame() {
@@ -165,7 +179,6 @@ function initializeGame() {
 
     gameRef.set({
         takoyaki: initialTakoyaki,
-        lastAction: '',
         history: []
     });
 }
