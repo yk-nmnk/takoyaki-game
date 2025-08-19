@@ -56,6 +56,7 @@
 
         /* ゲーム盤 */
         #plate {
+            position: relative; /* サプライズ表示のために追加 */
             background-color: #ffffff; width: 90vw; height: 90vw;
             max-width: var(--plate-size); max-height: var(--plate-size);
             border-radius: 50%; border: 5px solid #dcdcdc;
@@ -75,21 +76,30 @@
         .takoyaki:hover { transform: scale(1.1); }
         .takoyaki.hidden { opacity: 0; pointer-events: none; transform: scale(0.5); }
         
+        /* 誕生日サプライズ */
+        #birthday-surprise {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px);
+            border-radius: 50%; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            opacity: 0; animation: fadeIn 1s forwards; z-index: 50;
+            pointer-events: none; /* 下の要素をクリックさせない */
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+        #birthday-surprise h2 {
+            font-size: 2em; color: #ff69b4; text-shadow: 2px 2px 4px #fff;
+            margin: 0.5em 0;
+        }
+        #birthday-surprise svg { width: 60%; height: 60%; }
+
         /* 情報表示 */
         #info-text { font-size: 1.2em; font-weight: bold; min-height: 30px; color: #333; }
         
         /* 参加者と履歴 */
         #player-info { margin-bottom: 1em; }
-        #participants-list, #history-log {
-            list-style: none; padding: 0; text-align: left;
-        }
-        #participants-list li, #history-log li {
-            background: white; margin-bottom: 0.5em; padding: 0.5em; border-radius: 5px;
-        }
-        #history-log li.hazure {
-            background-color: #fab1a0;
-            font-weight: bold;
-        }
+        #participants-list, #history-log { list-style: none; padding: 0; text-align: left; }
+        #participants-list li, #history-log li { background: white; margin-bottom: 0.5em; padding: 0.5em; border-radius: 5px; }
+        #history-log li.hazure { background-color: #fab1a0; font-weight: bold; }
 
         /* ボタン */
         button {
@@ -118,6 +128,28 @@
             <p id="info-text">ゲームの準備中...</p>
             <div id="plate">
                 <div id="game-board"></div>
+                <!-- 誕生日サプライズ用の要素 -->
+                <div id="birthday-surprise" style="display: none;">
+                    <h2>Happy birthday Shuto!</h2>
+                    <svg viewBox="0 0 200 200">
+                        <!-- ケーキ本体 -->
+                        <path d="M 30 150 Q 100 180 170 150 L 170 100 Q 100 70 30 100 Z" fill="#f2d7b5"/>
+                        <ellipse cx="100" cy="100" rx="70" ry="30" fill="#fff0f5"/>
+                        <!-- ろうそく (中心の黄色) -->
+                        <rect x="95" y="60" width="10" height="30" fill="#ffd700"/>
+                        <ellipse cx="100" cy="60" rx="3" ry="2" fill="#ff4500"/>
+                        <!-- 周りのろうそく -->
+                        <g transform="translate(100, 95)">
+                            <g transform="rotate(0)"> <rect x="-5" y="-45" width="8" height="25" fill="#ff6b6b"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                            <g transform="rotate(51.4)"> <rect x="-5" y="-45" width="8" height="25" fill="#8e44ad"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                            <g transform="rotate(102.8)"> <rect x="-5" y="-45" width="8" height="25" fill="#2ecc71"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                            <g transform="rotate(154.2)"> <rect x="-5" y="-45" width="8" height="25" fill="#ff79c6"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                            <g transform="rotate(205.6)"> <rect x="-5" y="-45" width="8" height="25" fill="#54a0ff"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                            <g transform="rotate(257)"> <rect x="-5" y="-45" width="8" height="25" fill="#ffffff" stroke="#ccc" stroke-width="0.5"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                            <g transform="rotate(308.4)"> <rect x="-5" y="-45" width="8" height="25" fill="#badc58"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                        </g>
+                    </svg>
+                </div>
             </div>
             <button id="reset-button">ゲームをリセット</button>
         </div>
