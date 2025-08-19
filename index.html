@@ -76,10 +76,10 @@
         .takoyaki.hidden { opacity: 0; pointer-events: none; transform: scale(0.5); }
         
         /* 情報表示 */
-        #info-text, #last-action-text { font-size: 1.2em; font-weight: bold; min-height: 30px; color: #333; }
-        #last-action-text { color: var(--orange-dark); }
+        #info-text { font-size: 1.2em; font-weight: bold; min-height: 30px; color: #333; }
         
         /* 参加者と履歴 */
+        #player-info { margin-bottom: 1em; }
         #participants-list, #history-log {
             list-style: none; padding: 0; text-align: left;
         }
@@ -98,13 +98,15 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         button:hover { background-color: var(--orange-dark); }
+        #logout-button { background-color: #7f8c8d; }
+        #logout-button:hover { background-color: #636e72; }
     </style>
 </head>
 <body>
     <!-- 名前入力画面 -->
     <div id="name-entry-overlay">
         <div id="name-entry-box">
-            <h2>名前は？</h2>
+            <h2>名前を入力</h2>
             <input type="text" id="name-input" placeholder="なまえ" maxlength="10">
             <button id="name-submit">ゲームに参加</button>
         </div>
@@ -114,13 +116,16 @@
         <div class="game-area">
             <h1>たこ焼きロシアンルーレット</h1>
             <p id="info-text">ゲームの準備中...</p>
-            <p id="last-action-text">　</p>
             <div id="plate">
                 <div id="game-board"></div>
             </div>
             <button id="reset-button">ゲームをリセット</button>
         </div>
         <div class="info-area">
+            <div id="player-info" style="display: none;">
+                <p>ようこそ, <strong id="player-name-display"></strong> さん！</p>
+                <button id="logout-button">名前を変える</button>
+            </div>
             <h2>参加者</h2>
             <ul id="participants-list"></ul>
             <h2>履歴</h2>
