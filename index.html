@@ -70,7 +70,7 @@
         }
         .takoyaki::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3cdefs%3e%3cradialGradient id='grad' cx='0.3' cy='0.3' r='0.7'%3e%3cstop offset='0%25' stop-color='%23e6b88a'/%3e%3cstop offset='100%25' stop-color='%23c68642'/%3e%3c/radialGradient%3e%3c/defs%3e%3ccircle cx='50' cy='50' r='45' fill='url(%23grad)'/%3e%3cpath d='M20,50 C35,30 65,30 80,50' stroke='%23804a2e' stroke-width='10' fill='none' stroke-linecap='round'/%3e%3ccircle cx='35' cy='60' r='4' fill='%232e8b57'/%3e%3ccircle cx='65' cy='55' r='4' fill='%232e8b57'/%3e%3ccircle cx='50' cy='45' r='3' fill='%23ff6347'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3cdefs%e%3cradialGradient id='grad' cx='0.3' cy='0.3' r='0.7'%3e%3cstop offset='0%25' stop-color='%23e6b88a'/%3e%3cstop offset='100%25' stop-color='%23c68642'/%3e%3c/radialGradient%3e%3c/defs%3e%3ccircle cx='50' cy='50' r='45' fill='url(%23grad)'/%3e%3cpath d='M20,50 C35,30 65,30 80,50' stroke='%23804a2e' stroke-width='10' fill='none' stroke-linecap='round'/%3e%3ccircle cx='35' cy='60' r='4' fill='%232e8b57'/%3e%3ccircle cx='65' cy='55' r='4' fill='%232e8b57'/%3e%3ccircle cx='50' cy='45' r='3' fill='%23ff6347'/%3e%3c/svg%3e");
             background-size: cover;
         }
         .takoyaki:hover { transform: scale(1.1); }
@@ -116,7 +116,7 @@
     <!-- 名前入力画面 -->
     <div id="name-entry-overlay">
         <div id="name-entry-box">
-            <h2>名前を入力</h2>
+            <h2>名前を入力してくれ！</h2>
             <input type="text" id="name-input" placeholder="なまえ" maxlength="10">
             <button id="name-submit">ゲームに参加</button>
         </div>
@@ -136,18 +136,18 @@
                         <path d="M 30 150 Q 100 180 170 150 L 170 100 Q 100 70 30 100 Z" fill="#f2d7b5"/>
                         <ellipse cx="100" cy="100" rx="70" ry="30" fill="#fff0f5"/>
                         <!-- ろうそく (中心の黄色) -->
-                        <rect x="95" y="60" width="10" height="30" fill="#ffd700"/>
-                        <ellipse cx="100" cy="60" rx="3" ry="2" fill="#ff4500"/>
-                        <!-- 周りのろうそく -->
-                        <g transform="translate(100, 95)">
-                            <g transform="rotate(0)"> <rect x="-5" y="-45" width="8" height="25" fill="#ff6b6b"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
-                            <g transform="rotate(51.4)"> <rect x="-5" y="-45" width="8" height="25" fill="#8e44ad"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
-                            <g transform="rotate(102.8)"> <rect x="-5" y="-45" width="8" height="25" fill="#2ecc71"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
-                            <g transform="rotate(154.2)"> <rect x="-5" y="-45" width="8" height="25" fill="#ff79c6"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
-                            <g transform="rotate(205.6)"> <rect x="-5" y="-45" width="8" height="25" fill="#54a0ff"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
-                            <g transform="rotate(257)"> <rect x="-5" y="-45" width="8" height="25" fill="#ffffff" stroke="#ccc" stroke-width="0.5"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
-                            <g transform="rotate(308.4)"> <rect x="-5" y="-45" width="8" height="25" fill="#badc58"/> <ellipse cx="0" cy="-45" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                        <g transform="translate(95, 60)">
+                            <rect width="10" height="30" fill="#ffd700"/>
+                            <ellipse cx="5" cy="0" rx="3" ry="2" fill="#ff4500"/>
                         </g>
+                        <!-- 周りのろうそく -->
+                        <g transform="translate(126, 70)"> <rect width="8" height="25" fill="#ff6b6b"/> <ellipse cx="4" cy="0" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                        <g transform="translate(114.7, 93.4)"> <rect width="8" height="25" fill="#8e44ad"/> <ellipse cx="4" cy="0" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                        <g transform="translate(89.3, 99.3)"> <rect width="8" height="25" fill="#2ecc71"/> <ellipse cx="4" cy="0" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                        <g transform="translate(68.9, 83.3)"> <rect width="8" height="25" fill="#ff79c6"/> <ellipse cx="4" cy="0" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                        <g transform="translate(68.9, 56.7)"> <rect width="8" height="25" fill="#54a0ff"/> <ellipse cx="4" cy="0" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                        <g transform="translate(89.3, 40.7)"> <rect width="8" height="25" fill="#ffffff" stroke="#ccc" stroke-width="0.5"/> <ellipse cx="4" cy="0" rx="2" ry="1.5" fill="#ff4500"/> </g>
+                        <g transform="translate(114.7, 46.6)"> <rect width="8" height="25" fill="#badc58"/> <ellipse cx="4" cy="0" rx="2" ry="1.5" fill="#ff4500"/> </g>
                     </svg>
                 </div>
             </div>
