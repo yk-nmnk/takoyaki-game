@@ -10,6 +10,7 @@ const firebaseConfig = {
 };
 // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
+
 // --- この下はもういじらなくてOK！ ---
 
 firebase.initializeApp(firebaseConfig);
@@ -163,8 +164,9 @@ function selectTakoyaki(id) {
     }
     gameRef.transaction(currentState => {
         if (!currentState) return currentState;
-        const hazureCount = currentState.takoyaki.filter(t => t.opened && t.content !== 'あたり').length;
-        if (currentState.takoyaki[id].opened || hazureCount >= 2) return;
+        // ★★★ 修正点 ★★★
+        // 既に開いてるたこ焼きは選べないようにするだけに変更
+        if (currentState.takoyaki[id].opened) return;
 
         currentState.takoyaki[id].opened = true;
         const result = currentState.takoyaki[id].content;
